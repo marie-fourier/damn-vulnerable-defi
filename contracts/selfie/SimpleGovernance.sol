@@ -50,6 +50,7 @@ contract SimpleGovernance {
         actionCounter++;
 
         emit ActionQueued(actionId, msg.sender);
+
         return actionId;
     }
 
